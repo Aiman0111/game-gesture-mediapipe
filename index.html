@@ -4,70 +4,138 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Game Gesture MediaPipe</title>
+<title>Game Kotak Pintar</title>
+
 <style>
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #eef4ff;
-    color: #20304a;
-    text-align: center;
-  }
-  header { padding: 15px 10px 5px; }
-  h1 { margin: 4px; color: #3157b7; }
-  #status { font-weight: bold; margin: 10px; }
-  #game {
-    display: block;
-    width: min(96vw, 960px);
-    height: auto;
-    margin: 10px auto;
-    background: white;
-    border: 3px solid #b7c9f5;
-    border-radius: 16px;
-    touch-action: none;
-  }
-  button {
-    border: 0;
-    border-radius: 12px;
-    padding: 13px 22px;
-    margin: 6px;
-    font-size: 16px;
-    font-weight: bold;
-    background: #3157b7;
-    color: white;
-    cursor: pointer;
-  }
-  button:disabled { opacity: .5; }
-  #camera {
-    position: fixed;
-    width: 1px;
-    height: 1px;
-    opacity: 0;
-    pointer-events: none;
-  }
-  .help { max-width: 700px; margin: 12px auto 25px; padding: 0 14px; }
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  color: #24345b;
+  background: linear-gradient(135deg, #e8f1ff, #f9eaff);
+}
+
+header { padding: 14px 10px 4px; }
+
+h1 {
+  color: #3157b7;
+  margin: 5px;
+  font-size: clamp(25px, 4vw, 38px);
+}
+
+p { line-height: 1.5; }
+
+button {
+  padding: 12px 20px;
+  margin: 5px;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  background: #3157b7;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:disabled { opacity: .6; }
+
+#status {
+  font-weight: bold;
+  min-height: 24px;
+  margin: 10px;
+}
+
+#stage {
+  position: relative;
+  width: min(96vw, 960px);
+  margin: 12px auto;
+}
+
+#game {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 4px solid white;
+  border-radius: 18px;
+  box-shadow: 0 5px 22px #24345b30;
+  background: white;
+}
+
+#cameraBox {
+  position: absolute;
+  z-index: 5;
+  top: 12px;
+  right: 12px;
+  width: clamp(105px, 23%, 220px);
+  aspect-ratio: 4 / 3;
+  background: #172033;
+  border: 3px solid white;
+  border-radius: 13px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px #0005;
+}
+
+#camera {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+}
+
+#cameraLabel {
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  right: 0;
+  color: white;
+  background: #0009;
+  font-size: 11px;
+  padding: 4px;
+}
+
+#help {
+  max-width: 760px;
+  margin: 15px auto 28px;
+  padding: 0 15px;
+}
+
+@media (max-width: 550px) {
+  #cameraBox { top: 7px; right: 7px; }
+  button { padding: 10px 14px; font-size: 14px; }
+}
 </style>
 </head>
+
 <body>
+
 <header>
-  <h1>🎮 Kotak Pintar</h1>
-  <p>Bawa kotak ke jawapan yang betul menggunakan tangan!</p>
+  <h1>🎮 KOTAK PINTAR</h1>
+  <p>Bawa kotak ke jawapan menggunakan tangan!</p>
 </header>
 
-<div id="status">Tekan Mula Kamera untuk bermain.</div>
+<div id="status">Tekan MULA KAMERA untuk bermain.</div>
+
 <button id="start">📷 Mula Kamera</button>
 <button id="reset">🔄 Mula Semula</button>
 
-<video id="camera" autoplay playsinline muted></video>
-<canvas id="game" width="960" height="540"></canvas>
+<div id="stage">
+  <canvas id="game" width="960" height="540"></canvas>
 
-<div class="help">
-  <b>Cara bermain:</b>
-  <p>1. Tunjukkan tangan di hadapan kamera.</p>
-  <p>2. Rapatkan ibu jari dan jari telunjuk untuk memegang kotak.</p>
-  <p>3. Gerakkan tangan ke jawapan dan renggangkan jari untuk melepaskan kotak.</p>
-  <p>Pastikan seluruh kotak berada di dalam kawasan jawapan.</p>
+  <div id="cameraBox">
+    <video id="camera" autoplay playsinline muted></video>
+    <div id="cameraLabel">📷 Kamera anda</div>
+  </div>
+</div>
+
+<div id="help">
+  <b>Cara bermain</b>
+  <p>1. Tekan Mula Kamera dan benarkan akses kamera.</p>
+  <p>2. Tunjukkan tangan anda kepada kamera.</p>
+  <p>3. Cubit ibu jari dan jari telunjuk apabila penunjuk berada pada kotak biru.</p>
+  <p>4. Gerakkan tangan ke jawapan yang betul dan renggangkan jari untuk melepaskan kotak.</p>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"
@@ -86,7 +154,7 @@ const questions = [
   { q: "Pilih perkataan BOLA.", options: ["MEJA", "BOLA"], correct: 1 },
   { q: "Pilih haiwan.", options: ["KUCING", "BUKU"], correct: 0 },
   { q: "Pilih buah-buahan.", options: ["KERUSI", "EPAL"], correct: 1 },
-  { q: "Pilih alat tulis.", options: ["PENSel", "IKAN"], correct: 0 }
+  { q: "Pilih alat tulis.", options: ["PENSEL", "IKAN"], correct: 0 }
 ];
 
 let questionIndex = 0;
@@ -97,22 +165,19 @@ let pinching = false;
 let dragging = false;
 let cameraReady = false;
 let cameraObject = null;
-let handX = 480, handY = 250;
-let previousHand = null;
-let message = "Tekan Mula Kamera untuk bermula.";
-let messageUntil = 0;
+let handX = 480;
+let handY = 250;
+let message = "Bersedia untuk bermain!";
+let messageUntil = Date.now() + 2500;
 
 const box = { x: 448, y: 205, size: 64 };
+
 const zones = [
   { x: 145, y: 380, w: 280, h: 105 },
   { x: 535, y: 380, w: 280, h: 105 }
 ];
 
-function currentQuestion() {
-  return questions[questionIndex];
-}
-
-function say(text, duration = 2400) {
+function say(text, duration = 2200) {
   message = text;
   messageUntil = Date.now() + duration;
 }
@@ -123,59 +188,62 @@ function resetGame() {
   finished = false;
   dragging = false;
   pinching = false;
-  previousHand = null;
   box.x = 448;
   box.y = 205;
-  say("Bawa kotak ke jawapan yang betul!");
+  say("Cubit kotak biru untuk memulakan!");
   draw();
-}
-
-function inside(x, y, r) {
-  return x >= r.x && x <= r.x + r.w &&
-         y >= r.y && y <= r.y + r.h;
 }
 
 function draw() {
   ctx.clearRect(0, 0, 960, 540);
 
   const bg = ctx.createLinearGradient(0, 0, 960, 540);
-  bg.addColorStop(0, "#f4f7ff");
+  bg.addColorStop(0, "#f5f8ff");
   bg.addColorStop(1, "#dce8ff");
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, 960, 540);
 
+  ctx.textAlign = "left";
   ctx.fillStyle = "#3157b7";
   ctx.font = "bold 25px Arial";
-  ctx.textAlign = "left";
-  ctx.fillText("KOTAK PINTAR", 28, 38);
+  ctx.fillText("KOTAK PINTAR", 25, 38);
 
   ctx.textAlign = "right";
+  ctx.fillStyle = "#3157b7";
   ctx.fillText("Markah: " + score, 930, 38);
 
   if (finished) {
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(160, 130, 640, 260);
-    ctx.strokeStyle = "#56a878";
-    ctx.lineWidth = 5;
-    ctx.strokeRect(160, 130, 640, 260);
-    ctx.fillStyle = "#238653";
+    ctx.fillStyle = "white";
+    ctx.beginPath();
+    ctx.roundRect(160, 130, 640, 260, 24);
+    ctx.fill();
+
     ctx.textAlign = "center";
-    ctx.font = "bold 38px Arial";
+    ctx.fillStyle = "#238653";
+    ctx.font = "bold 44px Arial";
     ctx.fillText("TAHNIAH! 🎉", 480, 220);
-    ctx.font = "bold 28px Arial";
+
+    ctx.fillStyle = "#24345b";
+    ctx.font = "bold 30px Arial";
     ctx.fillText("Markah: " + score + "/" + questions.length, 480, 280);
-    ctx.font = "20px Arial";
+
+    ctx.font = "22px Arial";
     ctx.fillText("Tekan Mula Semula untuk bermain lagi.", 480, 330);
     return;
   }
 
-  const q = currentQuestion();
+  const q = questions[questionIndex];
+
   ctx.textAlign = "center";
-  ctx.fillStyle = "#243c70";
+  ctx.fillStyle = "#24345b";
+  ctx.font = "bold 28px Arial";
+  ctx.fillText(
+    "Soalan " + (questionIndex + 1) + " daripada " + questions.length,
+    480, 82
+  );
+
+  // Soalan diletakkan di tengah supaya tidak terlindung kamera
   ctx.font = "bold 30px Arial";
-  ctx.fillText("Soalan " + (questionIndex + 1) + " daripada " +
-               questions.length, 480, 85);
-  ctx.font = "bold 32px Arial";
   ctx.fillText(q.q, 480, 135);
 
   zones.forEach((z, i) => {
@@ -188,11 +256,11 @@ function draw() {
     ctx.stroke();
 
     ctx.fillStyle = "#3157b7";
-    ctx.font = "bold 28px Arial";
+    ctx.font = "bold 27px Arial";
     ctx.fillText(q.options[i], z.x + z.w / 2, z.y + 62);
   });
 
-  // Kotak yang boleh dipegang dengan jari
+  // Kotak yang dikawal oleh tangan
   ctx.fillStyle = dragging ? "#ffad42" : "#38a8e8";
   ctx.strokeStyle = "#ffffff";
   ctx.lineWidth = 4;
@@ -201,11 +269,11 @@ function draw() {
   ctx.fill();
   ctx.stroke();
 
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "bold 30px Arial";
-  ctx.fillText("📦", box.x + box.size / 2,
-               box.y + box.size / 2 + 10);
+  ctx.fillStyle = "white";
+  ctx.font = "bold 29px Arial";
+  ctx.fillText("K", box.x + box.size / 2, box.y + 42);
 
+  // Penunjuk kedudukan tangan
   if (handSeen) {
     ctx.beginPath();
     ctx.arc(handX, handY, 9, 0, Math.PI * 2);
@@ -215,8 +283,11 @@ function draw() {
 
   if (Date.now() < messageUntil) {
     ctx.fillStyle = "#ffffff";
-    ctx.fillRect(180, 285, 600, 52);
-    ctx.fillStyle = "#243c70";
+    ctx.beginPath();
+    ctx.roundRect(190, 285, 580, 52, 12);
+    ctx.fill();
+
+    ctx.fillStyle = "#24345b";
     ctx.font = "bold 19px Arial";
     ctx.fillText(message, 480, 318);
   }
@@ -226,13 +297,13 @@ function releaseBox() {
   dragging = false;
   pinching = false;
 
-  const centerX = box.x + box.size / 2;
-  const centerY = box.y + box.size / 2;
   let dropped = -1;
 
+  // Seluruh kotak mesti berada di dalam kawasan jawapan
   zones.forEach((z, i) => {
     const fullyInside =
-      box.x >= z.x && box.y >= z.y &&
+      box.x >= z.x &&
+      box.y >= z.y &&
       box.x + box.size <= z.x + z.w &&
       box.y + box.size <= z.y + z.h;
 
@@ -240,25 +311,25 @@ function releaseBox() {
   });
 
   if (dropped === -1) {
-    say("Cuba lagi. Bawa kotak ke dalam jawapan.");
+    say("Bawa seluruh kotak ke dalam jawapan.");
     box.x = 448;
     box.y = 205;
     draw();
     return;
   }
 
-  if (dropped === currentQuestion().correct) {
+  if (dropped === questions[questionIndex].correct) {
     score++;
     questionIndex++;
 
     if (questionIndex >= questions.length) {
       finished = true;
-      say("Tahniah! Semua soalan selesai.");
+      say("Semua soalan selesai!");
     } else {
       say("Betul! Bagus! 🌟");
     }
   } else {
-    say("Belum tepat. Cuba jawapan yang satu lagi.");
+    say("Belum tepat. Cuba lagi!");
   }
 
   box.x = 448;
@@ -267,60 +338,71 @@ function releaseBox() {
 }
 
 function onResults(results) {
-  const hands = results.multiHandLandmarks;
-  handSeen = !!(hands && hands.length);
+  const landmarks = results.multiHandLandmarks;
+  handSeen = !!(landmarks && landmarks.length);
 
   if (!handSeen) {
-    previousHand = null;
     pinching = false;
     dragging = false;
-    statusBox.textContent = "Tangan belum dikesan. Tunjukkan tangan.";
+    statusBox.textContent =
+      "Tangan belum dikesan. Tunjukkan tangan kepada kamera.";
     draw();
     return;
   }
 
-  const lm = hands[0];
-  // Guna hujung ibu jari dan jari telunjuk untuk cubitan
+  const lm = landmarks[0];
   const thumb = lm[4];
   const index = lm[8];
-  const distance = Math.hypot(thumb.x - index.x, thumb.y - index.y);
 
+  const distance = Math.hypot(
+    thumb.x - index.x,
+    thumb.y - index.y
+  );
+
+  // Jarak kecil bermaksud jari sedang mencubit
   pinching = distance < 0.065;
 
-  // Titik tengah cubitan, dipantulkan supaya sepadan dengan cermin
+  // Selaraskan koordinat kamera dengan paparan game
   handX = (1 - (thumb.x + index.x) / 2) * canvas.width;
   handY = ((thumb.y + index.y) / 2) * canvas.height;
 
   if (!finished) {
     if (pinching && !dragging) {
-      const pointInsideBox =
-        handX >= box.x - 15 &&
-        handX <= box.x + box.size + 15 &&
-        handY >= box.y - 15 &&
-        handY <= box.y + box.size + 15;
+      const nearBox =
+        handX >= box.x - 18 &&
+        handX <= box.x + box.size + 18 &&
+        handY >= box.y - 18 &&
+        handY <= box.y + box.size + 18;
 
-      if (pointInsideBox) dragging = true;
+      if (nearBox) dragging = true;
     }
 
     if (pinching && dragging) {
-      box.x = Math.max(0, Math.min(canvas.width - box.size,
-                                   handX - box.size / 2));
-      box.y = Math.max(150, Math.min(canvas.height - box.size,
-                                     handY - box.size / 2));
+      box.x = Math.max(
+        0,
+        Math.min(canvas.width - box.size, handX - box.size / 2)
+      );
+
+      box.y = Math.max(
+        150,
+        Math.min(canvas.height - box.size, handY - box.size / 2)
+      );
     }
 
-    if (!pinching && dragging) releaseBox();
+    if (!pinching && dragging) {
+      releaseBox();
+    }
   }
 
   statusBox.textContent = dragging
-    ? "Kotak dipegang! Gerakkan tangan."
-    : "Tangan dikesan. Cubit kotak untuk memegangnya.";
+    ? "Kotak dipegang! Gerakkan tangan ke jawapan."
+    : "Tangan dikesan. Cubit kotak biru untuk memegang.";
 
   draw();
 }
 
 const hands = new Hands({
-  locateFile: (file) =>
+  locateFile: file =>
     "https://cdn.jsdelivr.net/npm/@mediapipe/hands/" + file
 });
 
@@ -337,7 +419,7 @@ startButton.addEventListener("click", async () => {
   if (cameraReady) return;
 
   startButton.disabled = true;
-  statusBox.textContent = "Memulakan kamera...";
+  statusBox.textContent = "Sedang membuka kamera...";
 
   try {
     cameraObject = new Camera(video, {
@@ -349,13 +431,14 @@ startButton.addEventListener("click", async () => {
     });
 
     await cameraObject.start();
+
     cameraReady = true;
     say("Kamera aktif! Cubit kotak biru.");
     statusBox.textContent = "Kamera aktif. Tunjukkan tangan.";
   } catch (error) {
     console.error(error);
     statusBox.textContent =
-      "Kamera gagal dibuka. Benarkan akses kamera dan cuba HTTPS.";
+      "Kamera gagal dibuka. Benarkan akses kamera dan cuba lagi.";
     startButton.disabled = false;
   }
 });
@@ -364,5 +447,6 @@ document.getElementById("reset").addEventListener("click", resetGame);
 
 resetGame();
 </script>
+
 </body>
 </html>
